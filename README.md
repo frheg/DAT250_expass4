@@ -18,4 +18,4 @@ In terminal, navigate to project root and run with gradlew:
 ```bash
 ./gradlew bootRun
 ```
-Then use **Bruno** to interact with the API endpoints and test them. 
+Then use **Bruno** to interact with the API endpoints and test them. Default API endpoints are available at `http://localhost:8080/`.
