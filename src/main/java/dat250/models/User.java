@@ -33,26 +33,27 @@ public class User {
         this.password = password;
     }
 
-    public static class UpdateRequest {
-        private String email;
-        private String password;
+    // Just commented out old code, you can remove it yourself if you want
+    // public static class UpdateRequest {
+    //     private String email;
+    //     private String password;
 
-        // getters and setters
-        public UpdateRequest() {}
+    //     // getters and setters
+    //     public UpdateRequest() {}
 
-        public void setEmail(String email) {
-            this.email = email;
-        }
-        public void setPassword(String password) {
-            this.password = password;
-        }
+    //     public void setEmail(String email) {
+    //         this.email = email;
+    //     }
+    //     public void setPassword(String password) {
+    //         this.password = password;
+    //     }
 
-        public String getEmail() {
-            return email;
-        }
+    //     public String getEmail() {
+    //         return email;
+    //     }
 
-        public String getPassword() {
-            return password;
-        }
-    }
+    //     public String getPassword() {
+    //         return password;
+    //     }
+    // }
 }

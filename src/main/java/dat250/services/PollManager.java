@@ -30,16 +30,21 @@ public class PollManager {
     public List<User> getAllUsers() {
         return new ArrayList<>(users.values());
     }
-    public User updateUser(String userId, User.UpdateRequest user) {
-        // Update only user data, not the entire user
-        User updatedUser = users.get(userId);
-        if (updatedUser == null) {
+    public User updateUser(String userId, User updateRequest) {
+        User existingUser = users.get(userId);
+        if (existingUser == null) {
             return null;
         }
-        updatedUser.setEmail(user.getEmail());
-        updatedUser.setPassword(user.getPassword());
+        
+        // Only update fields that are provided, if null, then do not touch
+        if (updateRequest.getEmail() != null) {
+            existingUser.setEmail(updateRequest.getEmail());
+        }
+        if (updateRequest.getPassword() != null) {
+            existingUser.setPassword(updateRequest.getPassword());
+        }
 
-        return updatedUser;
+        return existingUser;
     }
     public void deleteUser(String userId) {
         users.remove(userId);
