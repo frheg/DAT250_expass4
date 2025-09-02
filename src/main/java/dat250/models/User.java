@@ -2,7 +2,7 @@ package dat250.models;
 
 public class User {
 
-    private String userId;
+    private String userId; // Also serves as username, as username has to be unique.
     private String email;
     private String password;
 

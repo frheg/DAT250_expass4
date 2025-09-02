@@ -5,7 +5,7 @@ import java.time.Instant;
 public class Vote {
 
     private String voteId;
-    private User userID;
+    private User userId;
     private Instant publishedAt;
 
     public Vote()   {
@@ -21,10 +21,10 @@ public class Vote {
 
     // UserId
     public User getUserId() {
-        return userID;
+        return userId;
     }
-    public void setUserId() {
-
+    public void setUserId(User userId) {
+        this.userId = userId;
     }
 
     // PublishedAt
