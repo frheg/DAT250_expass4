@@ -6,6 +6,7 @@ public class VoteOption {
     private String optionId;
     private String caption;
     private List<Vote> votes;
+    private String pollId;
 
     public VoteOption() {
     }
@@ -32,5 +33,13 @@ public class VoteOption {
     }
     public void setVotes(List<Vote> votes)  {
         this.votes = votes;     // NOTE: This implementation may be altered depending on votes should be appended or created new list each time.
+    }
+
+    // Poll
+    public String getPollId() {
+        return pollId;
+    }
+    public void setPollId(String pollId) {
+        this.pollId = pollId;
     }
 }
