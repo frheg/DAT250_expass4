@@ -19,11 +19,9 @@ public class PollComponent {
 
     @GetMapping("")
     private ResponseEntity<List<Poll>> getPolls() {
-        User user = new User("admin", "admin", "admin");
+        User user = new User();
 
         List<Poll> polls = new ArrayList<>();
-        polls.add(new Poll("1", "How old are you?", Instant.now(), Instant.now().plus(Duration.ofDays(7)), user, false));
-        polls.add(new Poll("2", "Where do you live?", Instant.now(), Instant.now().plus(Duration.ofDays(7)), user, false));
 
         return ResponseEntity.ok(polls);
     }
