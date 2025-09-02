@@ -7,10 +7,10 @@
 ## API Requests
 
 Users:
-- get users
-- create user
-- delete user
-- update user email, password
+- [x] get users
+- [x] create user
+- [x] delete user
+- [x] update user email, password
 
 Poll:
 - Create new poll (includes the VoteOption)

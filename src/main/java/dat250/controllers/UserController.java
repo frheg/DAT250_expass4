@@ -37,10 +37,12 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable String id, @RequestBody User user) {
+    public ResponseEntity<User> updateUser(@PathVariable String id, @RequestBody User.UpdateRequest user) {
         if (pollManager.getUser(id) == null) return ResponseEntity.notFound().build();
-        pollManager.updateUser(id, user);
-        return ResponseEntity.ok(user);
+        User newUser = pollManager.updateUser(id, user);
+
+        if (newUser == null) return ResponseEntity.notFound().build();
+        else  return ResponseEntity.ok(newUser);
     }
 
     @DeleteMapping("/{id}")
