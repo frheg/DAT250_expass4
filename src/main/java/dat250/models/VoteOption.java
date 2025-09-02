@@ -3,19 +3,19 @@ package dat250.models;
 import java.util.List;
 
 public class VoteOption {
-    private String voteId;
+    private String optionId;
     private String caption;
     private List<Vote> votes;
 
     public VoteOption() {
     }
 
-    // VoteId
-    public String getVoteId()   {
-        return voteId;
+    // OptionId
+    public String getOptionId()   {
+        return optionId;
     }
-    public void setVoteId(String voteId)    {
-        this.voteId = voteId;
+    public void setOptionId(String optionId)    {
+        this.optionId = optionId;
     }
 
     // Caption
