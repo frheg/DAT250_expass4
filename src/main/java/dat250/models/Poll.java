@@ -1,4 +1,4 @@
-package dat250.group2.poll.poll.entities;
+package dat250.models;
 
 import java.time.Instant;
 import java.util.List;
@@ -6,7 +6,7 @@ import java.util.List;
 public class Poll {
 
     // Poll
-    private String id;
+    private String pollId;
     private String question;
     private Instant publishedAt;
     private Instant validUntil;
@@ -17,16 +17,18 @@ public class Poll {
 
     private List<VoteOption> options;
 
-    public Poll(String id, String question, Instant publishedAt, Instant validUntil, User createdBy, Boolean publicAccess) {
-        this.id = id;
-        this.question = question;
-        this.publishedAt = publishedAt;
-        this.validUntil = validUntil;
-
-        this.createdBy = createdBy;
-        this.publicAccess = publicAccess;
+    public Poll() {
     }
 
+    // PollId
+    public String getPollId()   {
+        return pollId;
+    }
+    public void setPollId(String pollId) {
+        this.pollId = pollId;
+    }
+
+    // Question
     public String getQuestion() {
         return question;
     }
@@ -34,6 +36,7 @@ public class Poll {
         this.question = question;
     }
 
+    // PublishedAt
     public Instant getPublishedAt() {
         return publishedAt;
     }
@@ -41,6 +44,7 @@ public class Poll {
         this.publishedAt = publishedAt;
     }
 
+    // ValidUntil
     public Instant getValidUntil() {
         return validUntil;
     }
@@ -48,10 +52,27 @@ public class Poll {
         this.validUntil = validUntil;
     }
 
+    // Public Access
+    public Boolean getPublicAccess()    {
+        return publicAccess;
+    }
+    public void setPublicAccess(Boolean publicAccess)   {
+        this.publicAccess = publicAccess;
+    }
+
+    // CreatedBy
     public User getCreatedBy() {
         return createdBy;
     }
     public void setCreatedBy(User createdBy) {
         this.createdBy = createdBy;
+    }
+
+    // Options
+    public List<VoteOption> getOptions()    {
+        return options;
+    }
+    public void setOptions(List<VoteOption> options)    {
+        this.options = options;         // NOTE: This implementation may be altered depending on voteOptions should be appended or created new list each time.
     }
 }

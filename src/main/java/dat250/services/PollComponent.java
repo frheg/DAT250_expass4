@@ -1,11 +1,12 @@
-package dat250.group2.poll.poll;
+package dat250.services;
 
-import dat250.group2.poll.poll.entities.Poll;
-import dat250.group2.poll.poll.entities.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import dat250.models.Poll;
+import dat250.models.User;
 
 import java.time.Duration;
 import java.time.Instant;
