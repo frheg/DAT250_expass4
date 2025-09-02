@@ -56,10 +56,48 @@ public class PollManager {
         return poll;
     }
     public Poll getPoll(String pollId) {
-        return polls.get(pollId);
+        Poll poll = polls.get(pollId);
+        if (poll != null) {
+            // Populate the poll with its vote options
+            List<VoteOption> pollOptions = new ArrayList<>();
+            for (VoteOption option : voteOptions.values()) {
+                if (option.getPollId() != null && option.getPollId().equals(pollId)) {
+                    // Also populate each option with its votes
+                    List<Vote> optionVotes = new ArrayList<>();
+                    for (Vote vote : votes.values()) {
+                        if (vote.getVoteOptionId() != null && vote.getVoteOptionId().equals(option.getOptionId())) {
+                            optionVotes.add(vote);
+                        }
+                    }
+                    option.setVotes(optionVotes);
+                    pollOptions.add(option);
+                }
+            }
+            poll.setOptions(pollOptions);
+        }
+        return poll;
     }
     public List<Poll> getAllPolls() {
-        return new ArrayList<>(polls.values());
+        List<Poll> pollList = new ArrayList<>(polls.values());
+        // Populate each poll with its vote options
+        for (Poll poll : pollList) {
+            List<VoteOption> pollOptions = new ArrayList<>();
+            for (VoteOption option : voteOptions.values()) {
+                if (option.getPollId() != null && option.getPollId().equals(poll.getPollId())) {
+                    // Also populate each option with its votes
+                    List<Vote> optionVotes = new ArrayList<>();
+                    for (Vote vote : votes.values()) {
+                        if (vote.getVoteOptionId() != null && vote.getVoteOptionId().equals(option.getOptionId())) {
+                            optionVotes.add(vote);
+                        }
+                    }
+                    option.setVotes(optionVotes);
+                    pollOptions.add(option);
+                }
+            }
+            poll.setOptions(pollOptions);
+        }
+        return pollList;
     }
     public Poll updatePoll(String pollId, Poll poll) {
         polls.put(pollId, poll);
@@ -75,10 +113,32 @@ public class PollManager {
         return option;
     }
     public VoteOption getVoteOption(String optionId) {
-        return voteOptions.get(optionId);
+        VoteOption option = voteOptions.get(optionId);
+        if (option != null) {
+            // Populate the vote option with its votes
+            List<Vote> optionVotes = new ArrayList<>();
+            for (Vote vote : votes.values()) {
+                if (vote.getVoteOptionId() != null && vote.getVoteOptionId().equals(optionId)) {
+                    optionVotes.add(vote);
+                }
+            }
+            option.setVotes(optionVotes);
+        }
+        return option;
     }
     public List<VoteOption> getAllVoteOptions() {
-        return new ArrayList<>(voteOptions.values());
+        List<VoteOption> optionList = new ArrayList<>(voteOptions.values());
+        // Populate each vote option with its votes
+        for (VoteOption option : optionList) {
+            List<Vote> optionVotes = new ArrayList<>();
+            for (Vote vote : votes.values()) {
+                if (vote.getVoteOptionId() != null && vote.getVoteOptionId().equals(option.getOptionId())) {
+                    optionVotes.add(vote);
+                }
+            }
+            option.setVotes(optionVotes);
+        }
+        return optionList;
     }
     public VoteOption updateVoteOption(String optionId, VoteOption option) {
         voteOptions.put(optionId, option);
