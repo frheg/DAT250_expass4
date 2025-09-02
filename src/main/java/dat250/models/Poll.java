@@ -5,7 +5,6 @@ import java.util.List;
 
 public class Poll {
 
-    // Poll
     private String pollId;
     private String question;
     private Instant publishedAt;
