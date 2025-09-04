@@ -1,12 +1,11 @@
 package dat250.models;
 
 import java.time.Instant;
-import java.util.UUID;
 
 
 public class Vote {
 
-    private UUID voteId;
+    private String voteId;
     private User user;
     private String voteOptionId;
     private Instant publishedAt;
@@ -15,10 +14,10 @@ public class Vote {
     }
 
     // VoteId
-    public UUID getVoteId()   {
+    public String getVoteId()   {
         return voteId;
     }
-    public void setVoteId(UUID voteId)    {
+    public void setVoteId(String voteId)    {
         this.voteId = voteId;
     }
 

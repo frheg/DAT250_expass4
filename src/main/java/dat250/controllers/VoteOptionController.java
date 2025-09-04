@@ -32,16 +32,10 @@ public class VoteOptionController {
 
     @PostMapping("")
     public ResponseEntity<VoteOption> createVoteOption(@RequestBody VoteOption option) {
-        pollManager.createVoteOption(option);
-        return ResponseEntity.ok(option);
+        VoteOption created = pollManager.createVoteOption(option);
+        return ResponseEntity.ok(created);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<VoteOption> updateVoteOption(@PathVariable String id, @RequestBody VoteOption option) {
-        if (pollManager.getVoteOption(id) == null) return ResponseEntity.notFound().build();
-        pollManager.updateVoteOption(id, option);
-        return ResponseEntity.ok(option);
-    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteVoteOption(@PathVariable String id) {
