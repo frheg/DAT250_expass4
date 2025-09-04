@@ -1,6 +1,8 @@
 package dat250.controllers;
 
 import dat250.models.User;
+import dat250.models.UserRequests.UserGetResponse;
+import dat250.models.UserRequests.UserUpdateRequest;
 import dat250.services.PollManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,30 +21,30 @@ public class UserController {
     private PollManager pollManager;
 
     @GetMapping("")
-    public ResponseEntity<List<User>> getUsers() {
-        return ResponseEntity.ok(pollManager.getAllUsers());
+    public ResponseEntity<List<UserGetResponse>> getUsers() {
+        return ResponseEntity.ok(pollManager.getAllRestrictedUsers());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable String id) {
-        User user = pollManager.getUser(id);
+    public ResponseEntity<UserGetResponse> getUser(@PathVariable String id) {
+        UserGetResponse user = pollManager.getRestrictedUser(id);
         if (user == null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(user);
     }
 
     @PostMapping("")
     public ResponseEntity<User> createUser(@RequestBody User user) {
-        pollManager.createUser(user);
-        return ResponseEntity.ok(user);
+        User createdUser = pollManager.createUser(user);
+        if (createdUser == null) return ResponseEntity.badRequest().build();
+
+        return ResponseEntity.ok(createdUser);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable String id, @RequestBody User updateRequest) {
+    public ResponseEntity<User> updateUser(@PathVariable String id, @RequestBody UserUpdateRequest updateRequest) {
         User updatedUser = pollManager.updateUser(id, updateRequest);
-        
-        if (updatedUser == null) {
-            return ResponseEntity.notFound().build();
-        }
+        if (updatedUser == null) return ResponseEntity.notFound().build();
+
         return ResponseEntity.ok(updatedUser);
     }
 

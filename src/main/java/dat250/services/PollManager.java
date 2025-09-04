@@ -2,6 +2,8 @@ package dat250.services;
 
 import dat250.models.Poll;
 import dat250.models.User;
+import dat250.models.UserRequests.UserGetResponse;
+import dat250.models.UserRequests.UserUpdateRequest;
 import dat250.models.Vote;
 import dat250.models.VoteOption;
 import org.springframework.stereotype.Component;
@@ -21,16 +23,44 @@ public class PollManager {
 
     // User CRUD
     public User createUser(User user) {
+        User existingUser =  this.getUser(user.getUserId());
+        if (existingUser != null) return null;
+
         users.put(user.getUserId(), user);
         return user;
     }
+
     public User getUser(String userId) {
         return users.get(userId);
     }
+
+    public UserGetResponse getRestrictedUser(String userId) {
+        User user = this.getUser(userId);
+        if (user == null) return null;
+
+        UserGetResponse userGetResponse = new UserGetResponse();
+        userGetResponse.setEmail(user.getEmail());
+        userGetResponse.setUserId(user.getUserId());
+        return userGetResponse;
+    }
+
+    public List<UserGetResponse> getAllRestrictedUsers() {
+        List<UserGetResponse> restrictedUsers = new ArrayList<>();
+
+        for (User user : users.values()) {
+            UserGetResponse response = new UserGetResponse();
+            response.setEmail(user.getEmail());
+            response.setUserId(user.getUserId());
+            restrictedUsers.add(response);
+        }
+        return restrictedUsers;
+    }
+
     public List<User> getAllUsers() {
         return new ArrayList<>(users.values());
     }
-    public User updateUser(String userId, User updateRequest) {
+
+    public User updateUser(String userId, UserUpdateRequest updateRequest) {
         User existingUser = users.get(userId);
         if (existingUser == null) {
             return null;
