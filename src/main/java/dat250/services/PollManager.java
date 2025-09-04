@@ -17,7 +17,7 @@ import java.util.*;
 public class PollManager {
     private final Map<String, User> users = new HashMap<>();
     private final Map<String, Poll> polls = new HashMap<>();
-    private final Map<String, Vote> votes = new HashMap<>();
+    private final Map<UUID, Vote> votes = new HashMap<>();
     private final Map<String, VoteOption> voteOptions = new HashMap<>();
 
     // User CRUD
@@ -140,20 +140,25 @@ public class PollManager {
 
     // Vote CRUD
     public Vote createVote(Vote vote) {
+        vote.setVoteId(UUID.randomUUID());
+        vote.setPublishedAt(Instant.now());
         votes.put(vote.getVoteId(), vote);
         return vote;
     }
-    public Vote getVote(String voteId) {
+
+    public Vote getVote(UUID voteId) {
         return votes.get(voteId);
     }
+
     public List<Vote> getAllVotes() {
         return new ArrayList<>(votes.values());
     }
-    public Vote updateVote(String voteId, Vote vote) {
+
+    public Vote updateVote(UUID voteId, Vote vote) {
         votes.put(voteId, vote);
         return vote;
     }
-    public void deleteVote(String voteId) {
+    public void deleteVote(UUID voteId) {
         votes.remove(voteId);
     }
 
