@@ -25,7 +25,7 @@ public class PollController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Poll> getPoll(@PathVariable String id) {
+    public ResponseEntity<Poll> getPoll(@PathVariable String id) {  
         Poll poll = pollManager.getPoll(id);
         if (poll == null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(poll);
@@ -33,15 +33,15 @@ public class PollController {
 
     @PostMapping("")
     public ResponseEntity<Poll> createPoll(@RequestBody Poll poll) {
-        pollManager.createPoll(poll);
-        return ResponseEntity.ok(poll);
+        Poll createdPoll = pollManager.createPoll(poll);
+        return ResponseEntity.ok(createdPoll);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Poll> updatePoll(@PathVariable String id, @RequestBody Poll poll) {
-        if (pollManager.getPoll(id) == null) return ResponseEntity.notFound().build();
-        pollManager.updatePoll(id, poll);
-        return ResponseEntity.ok(poll);
+        Poll updatedPoll = pollManager.updatePoll(id, poll);
+        if (updatedPoll == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(updatedPoll);
     }
 
     @DeleteMapping("/{id}")
