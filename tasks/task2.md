@@ -23,3 +23,26 @@ Poll:
 Vote:
 - Create new vote of User to VoteOption
 - Delete vote of User to VoteOption
+
+
+## Open tasks
+vote:
+- Post: Set voteId and publishedAt automatically
+    - If poll is private: UserId is required
+    - If poll is public: UserId is not required
+- Put: not required
+- Get: Only return the userID, not entire user
+
+voteoptions (redundant but good for testing)
+- Put: not required (change Caption after votes is dangerous)
+- Post: Remove the possibility to add votes from start on; set Id automatically
+- Get: Good (except for user inside the votes)
+
+poll:
+- Get: Only return userID of creator, not entire user
+- Post: Set pollId automatically, set publishedAt automatically
+- Put: Only set ValidUntil and publicAccess
+
+user:
+- Get: Only return id and username
+- Post: Check if username is atomic
