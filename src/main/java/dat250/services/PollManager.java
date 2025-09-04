@@ -19,7 +19,9 @@ public class PollManager {
     private final Map<String, Vote> votes = new HashMap<>();
     private final Map<String, VoteOption> voteOptions = new HashMap<>();
 
-    // User CRUD
+    /**
+     * User CRUD
+     * */
     public User createUser(User user) {
         users.put(user.getUserId(), user);
         return user;
@@ -50,7 +52,9 @@ public class PollManager {
         users.remove(userId);
     }
 
-    // Poll CRUD
+    /**
+     * Poll CRUD
+     * */
     public Poll createPoll(Poll poll) {
         polls.put(poll.getPollId(), poll);
         return poll;
