@@ -22,7 +22,7 @@ import java.util.*;
 public class PollManager {
     private final Map<String, User> users = new HashMap<>();
     private final Map<String, Poll> polls = new HashMap<>();
-    private final Map<UUID, Vote> votes = new HashMap<>();
+    private final Map<String, Vote> votes = new HashMap<>();
     private final Map<String, VoteOption> voteOptions = new HashMap<>();
 
     // User CRUD
@@ -86,12 +86,15 @@ public class PollManager {
 
     // Poll CRUD
     public Poll createPoll(Poll poll) {
-        // Set pollId automatically using UUID
-        String pollId = UUID.randomUUID().toString();
-        poll.setPollId(pollId);
+        // Set pollId automatically using UUID only if not already set
+        if (poll.getPollId() == null || poll.getPollId().trim().isEmpty()) {
+            poll.setPollId(UUID.randomUUID().toString());
+        }
         
-        // Set publishedAt automatically to current time
-        poll.setPublishedAt(Instant.now());
+        // Set publishedAt automatically to current time only if not already set
+        if (poll.getPublishedAt() == null) {
+            poll.setPublishedAt(Instant.now());
+        }
         
         polls.put(poll.getPollId(), poll);
         return poll;
@@ -132,40 +135,38 @@ public class PollManager {
 
     // VoteOption CRUD
     public VoteOption createVoteOption(VoteOption option) {
+        // Set optionId automatically only if not already set
+        if (option.getOptionId() == null || option.getOptionId().trim().isEmpty()) {
+            option.setOptionId(UUID.randomUUID().toString());
+        }
+        option.setVotes(null);
+        
         voteOptions.put(option.getOptionId(), option);
         return option;
     }
     public VoteOption getVoteOption(String optionId) {
         VoteOption option = voteOptions.get(optionId);
         if (option != null) {
-            // Populate the vote option with its votes
-            List<Vote> optionVotes = new ArrayList<>();
-            for (Vote vote : votes.values()) {
-                if (vote.getVoteOptionId() != null && vote.getVoteOptionId().equals(optionId)) {
-                    optionVotes.add(vote);
-                }
-            }
-            option.setVotes(optionVotes);
+            VoteOption optionCopy = new VoteOption();
+            optionCopy.setOptionId(option.getOptionId());
+            optionCopy.setPollId(option.getPollId());
+            optionCopy.setCaption(option.getCaption());
+            optionCopy.setVotes(getFilteredVotesForOption(option.getOptionId()));
+            return optionCopy;
         }
-        return option;
+        return null;
     }
     public List<VoteOption> getAllVoteOptions() {
-        List<VoteOption> optionList = new ArrayList<>(voteOptions.values());
-        // Populate each vote option with its votes
-        for (VoteOption option : optionList) {
-            List<Vote> optionVotes = new ArrayList<>();
-            for (Vote vote : votes.values()) {
-                if (vote.getVoteOptionId() != null && vote.getVoteOptionId().equals(option.getOptionId())) {
-                    optionVotes.add(vote);
-                }
-            }
-            option.setVotes(optionVotes);
+        List<VoteOption> filteredOptions = new ArrayList<>();
+        for (VoteOption option : voteOptions.values()) {
+            VoteOption optionCopy = new VoteOption();
+            optionCopy.setOptionId(option.getOptionId());
+            optionCopy.setPollId(option.getPollId());
+            optionCopy.setCaption(option.getCaption());
+            optionCopy.setVotes(getFilteredVotesForOption(option.getOptionId()));
+            filteredOptions.add(optionCopy);
         }
-        return optionList;
-    }
-    public VoteOption updateVoteOption(String optionId, VoteOption option) {
-        voteOptions.put(optionId, option);
-        return option;
+        return filteredOptions;
     }
     public void deleteVoteOption(String optionId) {
         voteOptions.remove(optionId);
@@ -173,25 +174,50 @@ public class PollManager {
 
     // Vote CRUD
     public Vote createVote(Vote vote) {
-        vote.setVoteId(UUID.randomUUID());
-        vote.setPublishedAt(Instant.now());
+        // Set voteId automatically only if not already set
+        if (vote.getVoteId() == null || vote.getVoteId().trim().isEmpty()) {
+            vote.setVoteId(UUID.randomUUID().toString());
+        }
+        
+        // Set publishedAt automatically only if not already set
+        if (vote.getPublishedAt() == null) {
+            vote.setPublishedAt(Instant.now());
+        }
+        
+        // Check if poll is private and userId validation
+        if (vote.getVoteOptionId() != null) {
+            VoteOption option = voteOptions.get(vote.getVoteOptionId());
+            if (option != null && option.getPollId() != null) {
+                Poll poll = polls.get(option.getPollId());
+                if (poll != null && poll.getPublicAccess() != null && !poll.getPublicAccess()) {
+                    if (vote.getUser() == null || vote.getUser().getUserId() == null) {
+                        throw new IllegalArgumentException("UserId is required for private polls");
+                    }
+                }
+            }
+        }
+        
         votes.put(vote.getVoteId(), vote);
         return vote;
     }
 
-    public Vote getVote(UUID voteId) {
-        return votes.get(voteId);
+    public Vote getVote(String voteId) {
+        Vote vote = votes.get(voteId);
+        if (vote != null) {
+            return createFilteredVote(vote);
+        }
+        return null;
     }
 
     public List<Vote> getAllVotes() {
-        return new ArrayList<>(votes.values());
+        List<Vote> filteredVotes = new ArrayList<>();
+        for (Vote vote : votes.values()) {
+            filteredVotes.add(createFilteredVote(vote));
+        }
+        return filteredVotes;
     }
 
-    public Vote updateVote(UUID voteId, Vote vote) {
-        votes.put(voteId, vote);
-        return vote;
-    }
-    public void deleteVote(UUID voteId) {
+    public void deleteVote(String voteId) {
         votes.remove(voteId);
     }
 
@@ -225,14 +251,12 @@ public class PollManager {
         List<VoteOption> pollOptions = new ArrayList<>();
         for (VoteOption option : voteOptions.values()) {
             if (option.getPollId() != null && option.getPollId().equals(pollId)) {
-                // Create a copy to avoid modifying the original
                 VoteOption optionCopy = new VoteOption();
                 optionCopy.setOptionId(option.getOptionId());
                 optionCopy.setPollId(option.getPollId());
                 optionCopy.setCaption(option.getCaption());
                 
-                // Populate with votes
-                optionCopy.setVotes(getVotesForOption(option.getOptionId()));
+                optionCopy.setVotes(getFilteredVotesForOption(option.getOptionId()));
                 pollOptions.add(optionCopy);
             }
         }
@@ -248,5 +272,32 @@ public class PollManager {
             }
         }
         return optionVotes;
+    }
+    
+    private Vote createFilteredVote(Vote originalVote) {
+        if (originalVote == null) return null;
+        
+        Vote filteredVote = new Vote();
+        filteredVote.setVoteId(originalVote.getVoteId());
+        filteredVote.setVoteOptionId(originalVote.getVoteOptionId());
+        filteredVote.setPublishedAt(originalVote.getPublishedAt());
+        
+        if (originalVote.getUser() != null) {
+            User userSummary = new User();
+            userSummary.setUserId(originalVote.getUser().getUserId());
+            filteredVote.setUser(userSummary);
+        }
+        
+        return filteredVote;
+    }
+    
+    private List<Vote> getFilteredVotesForOption(String optionId) {
+        List<Vote> filteredVotes = new ArrayList<>();
+        for (Vote vote : votes.values()) {
+            if (vote.getVoteOptionId() != null && vote.getVoteOptionId().equals(optionId)) {
+                filteredVotes.add(createFilteredVote(vote));
+            }
+        }
+        return filteredVotes;
     }
 }

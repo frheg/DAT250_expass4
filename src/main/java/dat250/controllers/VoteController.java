@@ -5,7 +5,6 @@ import dat250.services.PollManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.UUID;
 
 import java.util.List;
 
@@ -25,7 +24,7 @@ public class VoteController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Vote> getVote(@PathVariable UUID id) {
+    public ResponseEntity<Vote> getVote(@PathVariable String id) {
         Vote vote = pollManager.getVote(id);
         if (vote == null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(vote);
@@ -33,19 +32,17 @@ public class VoteController {
 
     @PostMapping("")
     public ResponseEntity<Vote> createVote(@RequestBody Vote vote) {
-        Vote created = pollManager.createVote(vote);
-        return ResponseEntity.ok(created);
+        try {
+            Vote created = pollManager.createVote(vote);
+            return ResponseEntity.ok(created);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Vote> updateVote(@PathVariable UUID id, @RequestBody Vote vote) {
-        if (pollManager.getVote(id) == null) return ResponseEntity.notFound().build();
-        pollManager.updateVote(id, vote);
-        return ResponseEntity.ok(vote);
-    }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteVote(@PathVariable UUID id) {
+    public ResponseEntity<Void> deleteVote(@PathVariable String id) {
         pollManager.deleteVote(id);
         return ResponseEntity.noContent().build();
     }
