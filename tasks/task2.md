@@ -1,16 +1,42 @@
 # Basic Spring Boot Application
 
+*Students: Kamil, Maren, Fredric*
+
+The first exercise is about creating a first API as a Java Spring Boot application.
+For this a first data model was defined, which is extended below.
+
 ## Data Model
 
 ![Class Diagram](./img/poll_diagram_class.png)
 
+
+## Internal structure
+
+For the code structure the Model-View-Controller-Concept was applied. 
+The Model defines all classes and data-formats, the view represents the interface to the user with the RestAPI Components and the Controller contains the business logic.
+
+## Testing
+
+The development approach was "Test-Driven". With "Bruno" different API-Request-Files were created and the expected Outputs specified.
+After this the code was implemented and tested.
+
+In Bruno it is possible to write automated tests and execute all the different Test-Cases after each other.
+
+![img.png](img/bruno_testing.png)
+
+
 ## API Requests
 
+A Swagger UI was generated to have a good overview over all the different requests.
+
+Different CRUD-operations were implemented for the different components.
+
+
 Users:
-- [x] get users
-- [x] create user
-- [x] delete user
-- [x] update user email, password
+- get users
+- create user
+- delete user
+- update user email, password
 
 Poll:
 - Create new poll (includes the VoteOption)
@@ -46,3 +72,5 @@ poll:
 user:
 - Get: Only return id and username
 - Post: Check if username is atomic
+
+## Challenges during the work
