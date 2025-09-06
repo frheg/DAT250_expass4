@@ -2,10 +2,11 @@ package dat250.services;
 
 import dat250.models.Poll;
 import dat250.models.User;
+import dat250.models.UserRequests.UserGetResponse;
+import dat250.models.UserRequests.UserUpdateRequest;
 import dat250.models.Vote;
 import dat250.models.VoteOption;
 import org.springframework.stereotype.Component;
-
 import java.time.Instant;
 import java.util.*;
 
@@ -22,16 +23,44 @@ public class PollManager {
 
     // User CRUD
     public User createUser(User user) {
+        User existingUser =  this.getUser(user.getUserId());
+        if (existingUser != null) return null;
+
         users.put(user.getUserId(), user);
         return user;
     }
+
     public User getUser(String userId) {
         return users.get(userId);
     }
+
+    public UserGetResponse getRestrictedUser(String userId) {
+        User user = this.getUser(userId);
+        if (user == null) return null;
+
+        UserGetResponse userGetResponse = new UserGetResponse();
+        userGetResponse.setEmail(user.getEmail());
+        userGetResponse.setUserId(user.getUserId());
+        return userGetResponse;
+    }
+
+    public List<UserGetResponse> getAllRestrictedUsers() {
+        List<UserGetResponse> restrictedUsers = new ArrayList<>();
+
+        for (User user : users.values()) {
+            UserGetResponse response = new UserGetResponse();
+            response.setEmail(user.getEmail());
+            response.setUserId(user.getUserId());
+            restrictedUsers.add(response);
+        }
+        return restrictedUsers;
+    }
+
     public List<User> getAllUsers() {
         return new ArrayList<>(users.values());
     }
-    public User updateUser(String userId, User updateRequest) {
+
+    public User updateUser(String userId, UserUpdateRequest updateRequest) {
         User existingUser = users.get(userId);
         if (existingUser == null) {
             return null;
@@ -97,8 +126,19 @@ public class PollManager {
         return existingPoll;
     }
     public void deletePoll(String pollId) {
-        polls.remove(pollId);
-    }
+            if (pollId == null) return;
+            List<String> optionIds = new ArrayList<>();
+            for (VoteOption option : voteOptions.values()) {
+                if (pollId.equals(option.getPollId())) {
+                    optionIds.add(option.getOptionId());
+                }
+            }
+            for (String optionId : optionIds) {
+                deleteVoteOption(optionId);
+            }
+
+            polls.remove(pollId);
+        }
 
     // VoteOption CRUD
     public VoteOption createVoteOption(VoteOption option) {
@@ -136,6 +176,8 @@ public class PollManager {
         return filteredOptions;
     }
     public void deleteVoteOption(String optionId) {
+        if (optionId == null) return;
+        votes.values().removeIf(v -> optionId.equals(v.getVoteOptionId()));
         voteOptions.remove(optionId);
     }
 
