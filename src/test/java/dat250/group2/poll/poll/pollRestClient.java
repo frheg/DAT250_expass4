@@ -159,9 +159,29 @@ class pollRestClient {
         assertThat(createdVote1.getPublishedAt()).isNotNull(); // same here
         assertThat(createdVote1.getUser()).isNotNull();
         assertThat(createdVote1.getUser().getUserId()).isEqualTo("user2");
+        assertThat(createdVote1.getVoteOptionId()).isEqualTo(savedA.getOptionId());
 
         //9. User 2 changes vote
+        Vote vote2 = new Vote();
+        vote2.setVoteOptionId(savedB.getOptionId());
 
+        User voter2 = new User();
+        voter2.setUserId("user2");
+        vote2.setUser(voter2);
+
+        Vote createdVote2 = restClient.post()
+                .uri("/votes")
+                .body(vote2)
+                .retrieve()
+                .body(Vote.class);
+
+        assertThat(createdVote2).isNotNull();
+        assertThat(createdVote2.getVoteId()).isNotBlank();
+        assertThat(createdVote2.getPublishedAt()).isNotNull();
+        assertThat(createdVote2.getUser()).isNotNull();
+        assertThat(createdVote2.getUser().getUserId()).isEqualTo("user2");
+        assertThat(createdVote2.getVoteOptionId()).isEqualTo(savedB.getOptionId());
+        assertThat(createdVote2.getPublishedAt()).isAfter(createdVote1.getPublishedAt());
 
         //10. List votes and show vote
         Vote[] votes = restClient.get()
@@ -176,7 +196,7 @@ class pollRestClient {
                 .max(Comparator.comparing(Vote::getPublishedAt))
                 .orElseThrow();
 
-        assertThat(latestfromuser2.getVoteOptionId()).isEqualTo(savedA.getOptionId());
+        assertThat(latestfromuser2.getVoteOptionId()).isEqualTo(savedB.getOptionId());
 
         //11. Delete poll
         restClient.delete()
