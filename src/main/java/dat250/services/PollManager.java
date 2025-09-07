@@ -2,10 +2,12 @@ package dat250.services;
 
 import dat250.models.Poll;
 import dat250.models.User;
+import dat250.models.UserRequests.UserGetResponse;
+import dat250.models.UserRequests.UserUpdateRequest;
 import dat250.models.Vote;
 import dat250.models.VoteOption;
 import org.springframework.stereotype.Component;
-
+import java.time.Instant;
 import java.util.*;
 
 /**
@@ -23,16 +25,44 @@ public class PollManager {
      * User CRUD
      * */
     public User createUser(User user) {
+        User existingUser =  this.getUser(user.getUserId());
+        if (existingUser != null) return null;
+
         users.put(user.getUserId(), user);
         return user;
     }
+
     public User getUser(String userId) {
         return users.get(userId);
     }
+
+    public UserGetResponse getRestrictedUser(String userId) {
+        User user = this.getUser(userId);
+        if (user == null) return null;
+
+        UserGetResponse userGetResponse = new UserGetResponse();
+        userGetResponse.setEmail(user.getEmail());
+        userGetResponse.setUserId(user.getUserId());
+        return userGetResponse;
+    }
+
+    public List<UserGetResponse> getAllRestrictedUsers() {
+        List<UserGetResponse> restrictedUsers = new ArrayList<>();
+
+        for (User user : users.values()) {
+            UserGetResponse response = new UserGetResponse();
+            response.setEmail(user.getEmail());
+            response.setUserId(user.getUserId());
+            restrictedUsers.add(response);
+        }
+        return restrictedUsers;
+    }
+
     public List<User> getAllUsers() {
         return new ArrayList<>(users.values());
     }
-    public User updateUser(String userId, User updateRequest) {
+
+    public User updateUser(String userId, UserUpdateRequest updateRequest) {
         User existingUser = users.get(userId);
         if (existingUser == null) {
             return null;
@@ -56,118 +86,242 @@ public class PollManager {
      * Poll CRUD
      * */
     public Poll createPoll(Poll poll) {
+        // Set pollId automatically using UUID only if not already set
+        if (poll.getPollId() == null || poll.getPollId().trim().isEmpty()) {
+            poll.setPollId(UUID.randomUUID().toString());
+        }
+
+        System.out.println(poll.getPollId());
+
+        // Set publishedAt automatically to current time only if not already set
+        if (poll.getPublishedAt() == null) {
+            poll.setPublishedAt(Instant.now());
+        }
+
+        // Set VoteOption automatically if not defined
+        for (VoteOption option : poll.getOptions()) {
+            if (option.getOptionId() == null || option.getOptionId().trim().isEmpty()) {
+                option.setOptionId(UUID.randomUUID().toString());
+            }
+            option.setPollId(poll.getPollId());
+            this.createVoteOption(option);
+        }
+        
         polls.put(poll.getPollId(), poll);
         return poll;
     }
     public Poll getPoll(String pollId) {
         Poll poll = polls.get(pollId);
-        if (poll != null) {
-            // Populate the poll with its vote options
-            List<VoteOption> pollOptions = new ArrayList<>();
-            for (VoteOption option : voteOptions.values()) {
-                if (option.getPollId() != null && option.getPollId().equals(pollId)) {
-                    // Also populate each option with its votes
-                    List<Vote> optionVotes = new ArrayList<>();
-                    for (Vote vote : votes.values()) {
-                        if (vote.getVoteOptionId() != null && vote.getVoteOptionId().equals(option.getOptionId())) {
-                            optionVotes.add(vote);
-                        }
-                    }
-                    option.setVotes(optionVotes);
-                    pollOptions.add(option);
-                }
-            }
-            poll.setOptions(pollOptions);
-        }
-        return poll;
+        return createFilteredPoll(poll);
     }
     public List<Poll> getAllPolls() {
-        List<Poll> pollList = new ArrayList<>(polls.values());
-        // Populate each poll with its vote options
-        for (Poll poll : pollList) {
-            List<VoteOption> pollOptions = new ArrayList<>();
-            for (VoteOption option : voteOptions.values()) {
-                if (option.getPollId() != null && option.getPollId().equals(poll.getPollId())) {
-                    // Also populate each option with its votes
-                    List<Vote> optionVotes = new ArrayList<>();
-                    for (Vote vote : votes.values()) {
-                        if (vote.getVoteOptionId() != null && vote.getVoteOptionId().equals(option.getOptionId())) {
-                            optionVotes.add(vote);
-                        }
-                    }
-                    option.setVotes(optionVotes);
-                    pollOptions.add(option);
-                }
+        List<Poll> modifiedPolls = new ArrayList<>();
+        for (Poll poll : polls.values()) {
+            Poll filteredPoll = createFilteredPoll(poll);
+            if (filteredPoll != null) {
+                modifiedPolls.add(filteredPoll);
             }
-            poll.setOptions(pollOptions);
         }
-        return pollList;
+        return modifiedPolls;
     }
-    public Poll updatePoll(String pollId, Poll poll) {
-        polls.put(pollId, poll);
-        return poll;
+    public Poll updatePoll(String pollId, Poll updateRequest) {
+        Poll existingPoll = polls.get(pollId);
+        if (existingPoll == null) {
+            return null;
+        }
+        
+        // Only update validUntil and publicAccess fields
+        if (updateRequest.getValidUntil() != null) {
+            existingPoll.setValidUntil(updateRequest.getValidUntil());
+        }
+        if (updateRequest.getPublicAccess() != null) {
+            existingPoll.setPublicAccess(updateRequest.getPublicAccess());
+        }
+        
+        return existingPoll;
     }
     public void deletePoll(String pollId) {
-        polls.remove(pollId);
-    }
+            if (pollId == null) return;
+            List<String> optionIds = new ArrayList<>();
+            for (VoteOption option : voteOptions.values()) {
+                if (pollId.equals(option.getPollId())) {
+                    optionIds.add(option.getOptionId());
+                }
+            }
+            for (String optionId : optionIds) {
+                deleteVoteOption(optionId);
+            }
+
+            polls.remove(pollId);
+        }
 
     // VoteOption CRUD
     public VoteOption createVoteOption(VoteOption option) {
+        // Set optionId automatically only if not already set
+        if (option.getOptionId() == null || option.getOptionId().trim().isEmpty()) {
+            option.setOptionId(UUID.randomUUID().toString());
+        }
+        option.setVotes(null);
+        
         voteOptions.put(option.getOptionId(), option);
         return option;
     }
     public VoteOption getVoteOption(String optionId) {
         VoteOption option = voteOptions.get(optionId);
         if (option != null) {
-            // Populate the vote option with its votes
-            List<Vote> optionVotes = new ArrayList<>();
-            for (Vote vote : votes.values()) {
-                if (vote.getVoteOptionId() != null && vote.getVoteOptionId().equals(optionId)) {
-                    optionVotes.add(vote);
-                }
-            }
-            option.setVotes(optionVotes);
+            VoteOption optionCopy = new VoteOption();
+            optionCopy.setOptionId(option.getOptionId());
+            optionCopy.setPollId(option.getPollId());
+            optionCopy.setCaption(option.getCaption());
+            optionCopy.setVotes(getFilteredVotesForOption(option.getOptionId()));
+            return optionCopy;
         }
-        return option;
+        return null;
     }
     public List<VoteOption> getAllVoteOptions() {
-        List<VoteOption> optionList = new ArrayList<>(voteOptions.values());
-        // Populate each vote option with its votes
-        for (VoteOption option : optionList) {
-            List<Vote> optionVotes = new ArrayList<>();
-            for (Vote vote : votes.values()) {
-                if (vote.getVoteOptionId() != null && vote.getVoteOptionId().equals(option.getOptionId())) {
-                    optionVotes.add(vote);
-                }
-            }
-            option.setVotes(optionVotes);
+        List<VoteOption> filteredOptions = new ArrayList<>();
+        for (VoteOption option : voteOptions.values()) {
+            VoteOption optionCopy = new VoteOption();
+            optionCopy.setOptionId(option.getOptionId());
+            optionCopy.setPollId(option.getPollId());
+            optionCopy.setCaption(option.getCaption());
+            optionCopy.setVotes(getFilteredVotesForOption(option.getOptionId()));
+            filteredOptions.add(optionCopy);
         }
-        return optionList;
-    }
-    public VoteOption updateVoteOption(String optionId, VoteOption option) {
-        voteOptions.put(optionId, option);
-        return option;
+        return filteredOptions;
     }
     public void deleteVoteOption(String optionId) {
+        if (optionId == null) return;
+        votes.values().removeIf(v -> optionId.equals(v.getVoteOptionId()));
         voteOptions.remove(optionId);
     }
 
     // Vote CRUD
     public Vote createVote(Vote vote) {
+        // Set voteId automatically only if not already set
+        if (vote.getVoteId() == null || vote.getVoteId().trim().isEmpty()) {
+            vote.setVoteId(UUID.randomUUID().toString());
+        }
+        
+        // Set publishedAt automatically only if not already set
+        if (vote.getPublishedAt() == null) {
+            vote.setPublishedAt(Instant.now());
+        }
+        
+        // Check if poll is private and userId validation
+        if (vote.getVoteOptionId() != null) {
+            VoteOption option = voteOptions.get(vote.getVoteOptionId());
+            if (option != null && option.getPollId() != null) {
+                Poll poll = polls.get(option.getPollId());
+                if (poll != null && poll.getPublicAccess() != null && !poll.getPublicAccess()) {
+                    if (vote.getUser() == null || vote.getUser().getUserId() == null) {
+                        throw new IllegalArgumentException("UserId is required for private polls");
+                    }
+                }
+            }
+        }
+        
         votes.put(vote.getVoteId(), vote);
         return vote;
     }
+
     public Vote getVote(String voteId) {
-        return votes.get(voteId);
+        Vote vote = votes.get(voteId);
+        if (vote != null) {
+            return createFilteredVote(vote);
+        }
+        return null;
     }
+
     public List<Vote> getAllVotes() {
-        return new ArrayList<>(votes.values());
+        List<Vote> filteredVotes = new ArrayList<>();
+        for (Vote vote : votes.values()) {
+            filteredVotes.add(createFilteredVote(vote));
+        }
+        return filteredVotes;
     }
-    public Vote updateVote(String voteId, Vote vote) {
-        votes.put(voteId, vote);
-        return vote;
-    }
+
     public void deleteVote(String voteId) {
         votes.remove(voteId);
+    }
+
+    // ----- HELPER METHODS -----
+    // Helper method to create a poll with filtered creator info and populated options
+    private Poll createFilteredPoll(Poll originalPoll) {
+        if (originalPoll == null) return null;
+        
+        Poll modifiedPoll = new Poll();
+        modifiedPoll.setPollId(originalPoll.getPollId());
+        modifiedPoll.setQuestion(originalPoll.getQuestion());
+        modifiedPoll.setPublishedAt(originalPoll.getPublishedAt());
+        modifiedPoll.setValidUntil(originalPoll.getValidUntil());
+        modifiedPoll.setPublicAccess(originalPoll.getPublicAccess());
+        
+        // Only include userID of creator, not entire user object
+        if (originalPoll.getCreatedBy() != null) {
+            User creatorSummary = new User();
+            creatorSummary.setUserId(originalPoll.getCreatedBy().getUserId());
+            modifiedPoll.setCreatedBy(creatorSummary);
+        }
+        
+        // Populate with vote options
+        modifiedPoll.setOptions(getVoteOptionsForPoll(originalPoll.getPollId()));
+        
+        return modifiedPoll;
+    }
+    
+    // Helper method to get vote options for a specific poll
+    private List<VoteOption> getVoteOptionsForPoll(String pollId) {
+        List<VoteOption> pollOptions = new ArrayList<>();
+        for (VoteOption option : voteOptions.values()) {
+            if (option.getPollId() != null && option.getPollId().equals(pollId)) {
+                VoteOption optionCopy = new VoteOption();
+                optionCopy.setOptionId(option.getOptionId());
+                optionCopy.setPollId(option.getPollId());
+                optionCopy.setCaption(option.getCaption());
+                
+                optionCopy.setVotes(getFilteredVotesForOption(option.getOptionId()));
+                pollOptions.add(optionCopy);
+            }
+        }
+        return pollOptions;
+    }
+    
+    // Helper method to get votes for a specific option
+    private List<Vote> getVotesForOption(String optionId) {
+        List<Vote> optionVotes = new ArrayList<>();
+        for (Vote vote : votes.values()) {
+            if (vote.getVoteOptionId() != null && vote.getVoteOptionId().equals(optionId)) {
+                optionVotes.add(vote);
+            }
+        }
+        return optionVotes;
+    }
+    
+    private Vote createFilteredVote(Vote originalVote) {
+        if (originalVote == null) return null;
+        
+        Vote filteredVote = new Vote();
+        filteredVote.setVoteId(originalVote.getVoteId());
+        filteredVote.setVoteOptionId(originalVote.getVoteOptionId());
+        filteredVote.setPublishedAt(originalVote.getPublishedAt());
+        
+        if (originalVote.getUser() != null) {
+            User userSummary = new User();
+            userSummary.setUserId(originalVote.getUser().getUserId());
+            filteredVote.setUser(userSummary);
+        }
+        
+        return filteredVote;
+    }
+    
+    private List<Vote> getFilteredVotesForOption(String optionId) {
+        List<Vote> filteredVotes = new ArrayList<>();
+        for (Vote vote : votes.values()) {
+            if (vote.getVoteOptionId() != null && vote.getVoteOptionId().equals(optionId)) {
+                filteredVotes.add(createFilteredVote(vote));
+            }
+        }
+        return filteredVotes;
     }
 }

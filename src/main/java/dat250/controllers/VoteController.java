@@ -32,16 +32,14 @@ public class VoteController {
 
     @PostMapping("")
     public ResponseEntity<Vote> createVote(@RequestBody Vote vote) {
-        pollManager.createVote(vote);
-        return ResponseEntity.ok(vote);
+        try {
+            Vote created = pollManager.createVote(vote);
+            return ResponseEntity.ok(created);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Vote> updateVote(@PathVariable String id, @RequestBody Vote vote) {
-        if (pollManager.getVote(id) == null) return ResponseEntity.notFound().build();
-        pollManager.updateVote(id, vote);
-        return ResponseEntity.ok(vote);
-    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteVote(@PathVariable String id) {

@@ -2,6 +2,7 @@ package dat250.models;
 
 import java.time.Instant;
 
+
 public class Vote {
 
     private String voteId;
