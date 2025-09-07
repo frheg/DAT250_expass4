@@ -35,6 +35,7 @@ public class PollController {
     @PostMapping("")
     public ResponseEntity<Poll> createPoll(@RequestBody Poll poll) {
         Poll createdPoll = pollManager.createPoll(poll);
+        if (createdPoll == null) return ResponseEntity.badRequest().build();
         return ResponseEntity.ok(createdPoll);
     }
 

@@ -28,14 +28,48 @@ function App() {
       setPolls(data)
   }
 
+  async function createNewPoll(poll) {
+      const response = await fetch("http://localhost:8080/polls", {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json"
+          },
+          body: JSON.stringify(poll)
+      });
+
+      if (!response.ok) throw new Error("Failed to submit vote");
+
+      const data = await response.json();
+      console.log(data)
+
+      fetchPolls()
+  }
+
+
+    async function newVote(vote) {
+        const response = await fetch("http://localhost:8080/votes", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(vote)
+        });
+
+        if (!response.ok) throw new Error("Failed to submit vote");
+
+        const data = await response.json();
+        console.log(data)
+
+        fetchPolls()
+    }
 
   return (
     <>
         {polls.map(poll => (
-            <Poll key={`poll_${poll.pollId}`} poll={poll} />
+            <Poll newVoteCallback={newVote} key={`poll_${poll.pollId}`} poll={poll} />
         ))}
 
-        <CreatePoll />
+        <CreatePoll createPollCallback={createNewPoll} />
     </>
   )
 }

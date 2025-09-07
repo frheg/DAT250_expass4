@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import './Poll.css';
 import Vote from "./Vote.js";
 
-export default function Poll({poll}) {
+export default function Poll({poll, newVoteCallback}) {
 
     useEffect(() => {
         console.log('miau', poll, poll["question"])
@@ -24,7 +24,7 @@ export default function Poll({poll}) {
                             <h2 className="option-caption">{option.caption}</h2>
                             <p className="option-votes">Votes: {option.votes.length}</p>
                         </div>
-                        <Vote optionId={option.optionId} pollId={poll.pollId}/>
+                        <Vote newVoteCallback={newVoteCallback} optionId={option.optionId} pollId={poll.pollId}/>
                     </div>
                 ))}
             </div>

@@ -1,30 +1,26 @@
 import {useEffect, useState} from "react";
 import './Poll.css';
 
-export default function Vote({optionId, pollId}) {
+export default function Vote({optionId, pollId, newVoteCallback}) {
+
+    const [votedBy, setVotedBy] = useState("user1")
 
     useEffect(() => {
         console.log('miau', optionId, pollId)
     }, []);
 
     function onVote() {
-        /**
-        const response = await fetch("http://localhost:8080/vote", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
+        let now = new Date()
+
+        const vote = {
+            user: {
+                userId: votedBy
             },
-            body: JSON.stringify({
-                pollId: pollId,
-                optionId: optionId
-            })
-        });
+            voteOptionId: optionId,
+            pollId: pollId
+        }
 
-        if (!response.ok) throw new Error("Failed to submit vote");
-
-        const data = await response.json();
-        return data;
-            */
+        newVoteCallback(vote)
 
         console.log("Vote")
     }

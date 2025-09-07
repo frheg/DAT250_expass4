@@ -8,6 +8,7 @@ import dat250.models.Vote;
 import dat250.models.VoteOption;
 import org.springframework.stereotype.Component;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 /**
@@ -91,7 +92,19 @@ public class PollManager {
             poll.setPollId(UUID.randomUUID().toString());
         }
 
-        System.out.println(poll.getPollId());
+        // User is required
+        User createdBy = poll.getCreatedBy();
+        if (createdBy == null || createdBy.getUserId() == null) {
+            return null;
+        }
+        if (!users.containsKey(createdBy.getUserId())) {
+            return null;
+        }
+
+        // Set validUntil in future if not set
+        if (poll.getValidUntil() == null) {
+            poll.setValidUntil(Instant.now().plus(30, ChronoUnit.DAYS));
+        }
 
         // Set publishedAt automatically to current time only if not already set
         if (poll.getPublishedAt() == null) {
