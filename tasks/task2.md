@@ -21,13 +21,31 @@ The development approach was "Test-Driven". With "Bruno" different API-Request-F
 After this the code was implemented and tested.
 
 In Bruno it is possible to write automated tests and execute all the different Test-Cases after each other.
+This is done with the Bruno Runner feature.
 
-![img.png](img/bruno_testing.png)
+![img.png](img/Bruno_testing.png)
 
+Example test:
+```js
+test("should be able to create user", function () {
+  expect(res.getStatus()).to.equal(200);
+});
+
+test("should return json with correct user data", function () {
+  const resBody = res.getBody();
+  expect(resBody).to.have.property('userId');
+  expect(resBody.email).to.equal('john.doe@example.com');
+  bru.setVar('userId', resBody.userId);
+});
+```
 
 ## API Requests
 
 A Swagger UI was generated to have a good overview over all the different requests.
+The API can be accessed over: [http://localhost:8080/swagger-ui/index.html#/](http://localhost:8080/swagger-ui/index.html#/)
+
+![img.png](img/SwaggerUi.png)
+
 
 Different CRUD-operations were implemented for the different components.
 
@@ -67,27 +85,6 @@ The PUT-operations for vote and voteOption are not required.
 It does not make any sense to change a vote, because a vote is more or less a boolean.
 Changing the voteOption also makes no sense (logically), because you could manipulate the result.
 
-## Open tasks
-vote:
-- Post: Set voteId and publishedAt automatically
-    - If poll is private: UserId is required
-    - If poll is public: UserId is not required
-- Put: not required
-- Get: Only return the userID, not entire user
-
-voteoptions (redundant but good for testing)
-- Put: not required (change Caption after votes is dangerous)
-- Post: Remove the possibility to add votes from start on; set Id automatically
-- Get: Good (except for user inside the votes)
-
-poll:
-- Get: Only return userID of creator, not entire user
-- Post: Set pollId automatically, set publishedAt automatically
-- Put: Only set ValidUntil and publicAccess
-
-user:
-- Get: Only return id and username
-- Post: Check if username is atomic
 
 ## Challenges during the work
 

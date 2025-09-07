@@ -86,10 +86,21 @@ public class PollManager {
         if (poll.getPollId() == null || poll.getPollId().trim().isEmpty()) {
             poll.setPollId(UUID.randomUUID().toString());
         }
-        
+
+        System.out.println(poll.getPollId());
+
         // Set publishedAt automatically to current time only if not already set
         if (poll.getPublishedAt() == null) {
             poll.setPublishedAt(Instant.now());
+        }
+
+        // Set VoteOption automatically if not defined
+        for (VoteOption option : poll.getOptions()) {
+            if (option.getOptionId() == null || option.getOptionId().trim().isEmpty()) {
+                option.setOptionId(UUID.randomUUID().toString());
+            }
+            option.setPollId(poll.getPollId());
+            this.createVoteOption(option);
         }
         
         polls.put(poll.getPollId(), poll);
