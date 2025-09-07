@@ -1,6 +1,10 @@
 # Basic Spring Boot Application
 
-*Students: Kamil, Maren, Fredric*
+*Students*: Kamil, Maren, Fredric
+
+*Course*: DAT250 at HVL Bergen - Master Software Engineering 
+
+*Code*: [https://github.com/Maren24/DAT250](https://github.com/Maren24/DAT250)
 
 The first exercise is about creating a first API as a Java Spring Boot application.
 For this a first data model was defined, which is extended below.
