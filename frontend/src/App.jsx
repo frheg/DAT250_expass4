@@ -6,6 +6,7 @@ import Poll from "./components/Poll.jsx";
 import CreatePoll from "./components/CreatePoll.jsx";
 
 const USER_ID = "user1"
+const address = import.meta.env.VITE_API_BASE_URL
 
 function App() {
     const [count, setCount] = useState(0)
@@ -17,6 +18,8 @@ function App() {
         manageUser()
 
         fetchPolls()
+
+        console.log('Address', import.meta.env.VITE_API_BASE_URL, address)
     }, []);
 
 
@@ -27,7 +30,7 @@ function App() {
 
         // Test if user already exists
         if (userId == null || checkUserExists == null) {
-            const newUser = createNewUser({userId: USER_ID, email: 'miau@gmx.no', password: 'miaumiau'})
+            const newUser = createNewUser({userId: USER_ID, email: 'dummy-user@gmx.no', password: 'dummy-user'})
 
             localStorage.setItem('userId', USER_ID)
             setUserId(USER_ID)
@@ -37,7 +40,7 @@ function App() {
     }
 
     async function fetchPolls() {
-        const response = await fetch("http://localhost:8080/polls");
+        const response = await fetch(`${address}/polls`);
         if (!response.ok) throw new Error("Network error");
         const data = await response.json();
 
@@ -50,7 +53,7 @@ function App() {
     }
 
     async function createNewPoll(poll) {
-        const response = await fetch("http://localhost:8080/polls", {
+        const response = await fetch(`${address}/polls`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -67,7 +70,7 @@ function App() {
     }
 
     async function createNewUser(user) {
-        const response = await fetch("http://localhost:8080/users", {
+        const response = await fetch(`${address}/users`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -82,7 +85,7 @@ function App() {
     }
 
     async function requestUser(userId) {
-        const response = await fetch("http://localhost:8080/users/" + userId);
+        const response = await fetch(`${address}/users/` + userId);
         if (!response.ok) return null;
 
         const data = await response.json();
@@ -91,7 +94,7 @@ function App() {
     }
 
     async function newVote(vote) {
-        const response = await fetch("http://localhost:8080/votes", {
+        const response = await fetch(`${address}/votes`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
