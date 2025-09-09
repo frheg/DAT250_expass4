@@ -8,6 +8,7 @@ import dat250.models.Vote;
 import dat250.models.VoteOption;
 import org.springframework.stereotype.Component;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 /**
@@ -21,7 +22,9 @@ public class PollManager {
     private final Map<String, Vote> votes = new HashMap<>();
     private final Map<String, VoteOption> voteOptions = new HashMap<>();
 
-    // User CRUD
+    /**
+     * User CRUD
+     * */
     public User createUser(User user) {
         User existingUser =  this.getUser(user.getUserId());
         if (existingUser != null) return null;
@@ -80,16 +83,41 @@ public class PollManager {
         users.remove(userId);
     }
 
-    // Poll CRUD
+    /**
+     * Poll CRUD
+     * */
     public Poll createPoll(Poll poll) {
         // Set pollId automatically using UUID only if not already set
         if (poll.getPollId() == null || poll.getPollId().trim().isEmpty()) {
             poll.setPollId(UUID.randomUUID().toString());
         }
-        
+
+        // User is required
+        User createdBy = poll.getCreatedBy();
+        if (createdBy == null || createdBy.getUserId() == null) {
+            return null;
+        }
+        if (!users.containsKey(createdBy.getUserId())) {
+            return null;
+        }
+
+        // Set validUntil in future if not set
+        if (poll.getValidUntil() == null) {
+            poll.setValidUntil(Instant.now().plus(30, ChronoUnit.DAYS));
+        }
+
         // Set publishedAt automatically to current time only if not already set
         if (poll.getPublishedAt() == null) {
             poll.setPublishedAt(Instant.now());
+        }
+
+        // Set VoteOption automatically if not defined
+        for (VoteOption option : poll.getOptions()) {
+            if (option.getOptionId() == null || option.getOptionId().trim().isEmpty()) {
+                option.setOptionId(UUID.randomUUID().toString());
+            }
+            option.setPollId(poll.getPollId());
+            this.createVoteOption(option);
         }
         
         polls.put(poll.getPollId(), poll);

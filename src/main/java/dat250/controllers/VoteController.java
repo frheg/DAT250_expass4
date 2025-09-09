@@ -13,6 +13,7 @@ import java.util.List;
  */
 
 @RestController
+@CrossOrigin
 @RequestMapping("/votes")
 public class VoteController {
     @Autowired

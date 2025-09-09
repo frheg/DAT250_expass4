@@ -14,6 +14,7 @@ import java.util.List;
  */
 
 @RestController
+@CrossOrigin
 @RequestMapping("/polls")
 public class PollController {
     @Autowired
@@ -34,6 +35,7 @@ public class PollController {
     @PostMapping("")
     public ResponseEntity<Poll> createPoll(@RequestBody Poll poll) {
         Poll createdPoll = pollManager.createPoll(poll);
+        if (createdPoll == null) return ResponseEntity.badRequest().build();
         return ResponseEntity.ok(createdPoll);
     }
 

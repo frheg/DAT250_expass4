@@ -17,3 +17,17 @@ body:json {
     "password": "password456"
   }
 }
+
+tests {
+  test("should be able to create user", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("should return json", function () {
+    expect(res.getBody()).to.eql({
+    "userId": "user2",
+    "email": "user2@example.com",
+    "password": "password456"
+  });
+  });
+}

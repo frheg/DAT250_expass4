@@ -12,8 +12,22 @@ post {
 
 body:json {
   {
-    "userId": "user1",
+    "userId": "user5",
     "email": "user1@example.com",
     "password": "password123"
   }
+}
+
+tests {
+  test("should be able to create user", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("should return json", function () {
+    expect(res.getBody()).to.eql({
+    "userId": "user5",
+    "email": "user1@example.com",
+    "password": "password123"
+  });
+  });
 }
