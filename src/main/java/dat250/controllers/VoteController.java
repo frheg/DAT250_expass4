@@ -41,6 +41,13 @@ public class VoteController {
         }
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Vote> updateVote(@PathVariable String id, @RequestBody Vote vote) {
+        Vote updatedVote = pollManager.updateVote(id, vote);
+        if (updatedVote == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(updatedVote);
+    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteVote(@PathVariable String id) {

@@ -230,6 +230,14 @@ public class PollManager {
                     if (vote.getUser() == null || vote.getUser().getUserId() == null) {
                         throw new IllegalArgumentException("UserId is required for private polls");
                     }
+                    for (Vote v : votes.values()) {
+                        if (v.getUser() !=null && v.getUser().getUserId().equals(vote.getUser().getUserId())) {
+                            VoteOption existingVo =  voteOptions.get(v.getVoteOptionId());
+                            if(existingVo != null && poll.getPollId().equals(existingVo.getPollId())) {
+                                return updateVote(v.getVoteId(), vote);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -246,12 +254,29 @@ public class PollManager {
         return null;
     }
 
+
     public List<Vote> getAllVotes() {
         List<Vote> filteredVotes = new ArrayList<>();
         for (Vote vote : votes.values()) {
             filteredVotes.add(createFilteredVote(vote));
         }
         return filteredVotes;
+    }
+
+    public Vote updateVote(String id, Vote updatedVote) {
+        Vote existingVote = votes.get(id);
+        if (existingVote == null) {
+            return null;
+        }
+
+        if (updatedVote.getPublishedAt() == null) {
+            existingVote.setPublishedAt(updatedVote.getPublishedAt());
+        }
+
+        if (updatedVote.getVoteOptionId() != null) {
+            existingVote.setVoteOptionId(updatedVote.getVoteOptionId());
+        }
+        return existingVote;
     }
 
     public void deleteVote(String voteId) {

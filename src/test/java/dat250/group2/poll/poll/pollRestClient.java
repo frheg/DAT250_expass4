@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -94,6 +95,7 @@ class pollRestClient {
         User creator = new User();
         creator.setUserId("Dummy");
         testpoll.setCreatedBy(creator);
+        testpoll.setOptions(new ArrayList<>());
 
         Poll createdpoll = restClient.post()
                 .uri("/polls")
