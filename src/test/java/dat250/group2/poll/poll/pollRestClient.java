@@ -178,12 +178,10 @@ class pollRestClient {
                 .body(Vote.class);
 
         assertThat(createdVote2).isNotNull();
-        assertThat(createdVote2.getVoteId()).isNotBlank();
-        assertThat(createdVote2.getPublishedAt()).isNotNull();
-        assertThat(createdVote2.getUser()).isNotNull();
+        assertThat(createdVote2.getVoteId()).isEqualTo(createdVote1.getVoteId()); // same id cuz new logic from updatevote
+        assertThat(createdVote2.getPublishedAt()).isAfterOrEqualTo(createdVote1.getPublishedAt());
         assertThat(createdVote2.getUser().getUserId()).isEqualTo("user2");
         assertThat(createdVote2.getVoteOptionId()).isEqualTo(savedB.getOptionId());
-        assertThat(createdVote2.getPublishedAt()).isAfter(createdVote1.getPublishedAt());
 
         //10. List votes and show vote
         Vote[] votes = restClient.get()

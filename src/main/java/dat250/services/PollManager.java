@@ -215,12 +215,12 @@ public class PollManager {
         if (vote.getVoteId() == null || vote.getVoteId().trim().isEmpty()) {
             vote.setVoteId(UUID.randomUUID().toString());
         }
-        
+
         // Set publishedAt automatically only if not already set
         if (vote.getPublishedAt() == null) {
             vote.setPublishedAt(Instant.now());
         }
-        
+
         // Check if poll is private and userId validation
         if (vote.getVoteOptionId() != null) {
             VoteOption option = voteOptions.get(vote.getVoteOptionId());
@@ -234,6 +234,7 @@ public class PollManager {
                         if (v.getUser() !=null && v.getUser().getUserId().equals(vote.getUser().getUserId())) {
                             VoteOption existingVo =  voteOptions.get(v.getVoteOptionId());
                             if(existingVo != null && poll.getPollId().equals(existingVo.getPollId())) {
+
                                 return updateVote(v.getVoteId(), vote);
                             }
                         }
@@ -241,7 +242,7 @@ public class PollManager {
                 }
             }
         }
-        
+
         votes.put(vote.getVoteId(), vote);
         return vote;
     }
@@ -268,6 +269,8 @@ public class PollManager {
         if (existingVote == null) {
             return null;
         }
+
+        existingVote.setPublishedAt(Instant.now());
 
         if (updatedVote.getPublishedAt() == null) {
             existingVote.setPublishedAt(updatedVote.getPublishedAt());
