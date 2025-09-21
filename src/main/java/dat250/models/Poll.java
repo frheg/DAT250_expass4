@@ -1,31 +1,66 @@
 package dat250.models;
 
+import jakarta.persistence.*;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
+@Entity
 public class Poll {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    // Legacy field used by in-memory PollManager (not persisted)
+    @Transient
     private String pollId;
+
     private String question;
     private Instant publishedAt;
     private Instant validUntil;
 
     private Boolean publicAccess;
 
+    @ManyToOne(fetch = FetchType.LAZY)
     private User createdBy;
 
-    private List<VoteOption> options;
+    @OneToMany(mappedBy = "poll", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("presentationOrder ASC")
+    private List<VoteOption> options = new ArrayList<>();
 
     public Poll() {
     }
 
-    // PollId
-    public String getPollId()   {
-        return pollId;
+    /**
+     *
+     * Adds a new option to this Poll and returns the respective
+     * VoteOption object with the given caption.
+     * The value of the presentationOrder field gets determined
+     * by the size of the currently existing VoteOptions for this Poll.
+     * I.e. the first added VoteOption has presentationOrder=0, the secondly
+     * registered VoteOption has presentationOrder=1 ans so on.
+     */
+    public VoteOption addVoteOption(String caption) {
+        if (caption == null) {
+            throw new IllegalArgumentException("caption must not be null");
+        }
+        VoteOption option = new VoteOption();
+        option.setCaption(caption);
+        option.setPresentationOrder(options.size());
+        option.setPoll(this);
+        options.add(option);
+        return option;
     }
-    public void setPollId(String pollId) {
-        this.pollId = pollId;
+
+    // Id
+    public Long getId()   {
+        return id;
     }
+
+    // Legacy pollId for in-memory manager
+    public String getPollId() { return pollId; }
+    public void setPollId(String pollId) { this.pollId = pollId; }
 
     // Question
     public String getQuestion() {

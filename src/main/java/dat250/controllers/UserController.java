@@ -22,8 +22,8 @@ public class UserController {
     private PollManager pollManager;
 
     @GetMapping("")
-    public ResponseEntity<List<UserGetResponse>> getUsers() {
-        return ResponseEntity.ok(pollManager.getAllRestrictedUsers());
+    public ResponseEntity<List<User>> getUsers() {
+        return ResponseEntity.ok(pollManager.getAllUsers());
     }
 
     @GetMapping("/{id}")

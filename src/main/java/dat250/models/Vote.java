@@ -1,41 +1,44 @@
 package dat250.models;
 
+import jakarta.persistence.*;
 import java.time.Instant;
 
-
+@Entity
 public class Vote {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    // Legacy fields for in-memory PollManager compatibility (not persisted)
+    @Transient
     private String voteId;
-    private User user;
+    @Transient
     private String voteOptionId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User votedBy;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private VoteOption votesOn;
+
     private Instant publishedAt;
 
     public Vote()   {
     }
 
-    // VoteId
-    public String getVoteId()   {
-        return voteId;
-    }
-    public void setVoteId(String voteId)    {
-        this.voteId = voteId;
+    // Id
+    public Long getId()   {
+        return id;
     }
 
-    // User
-    public User getUser() {
-        return user;
-    }
-    public void setUser(User user) {
-        this.user = user;
-    }
+    // votedBy
+    public User getVotedBy() { return votedBy; }
+    public void setVotedBy(User user) { this.votedBy = user; }
 
-    // VoteOptionId
-    public String getVoteOptionId() {
-        return voteOptionId;
-    }
-    public void setVoteOptionId(String voteOptionId) {
-        this.voteOptionId = voteOptionId;
-    }
+    // votesOn
+    public VoteOption getVotesOn() { return votesOn; }
+    public void setVotesOn(VoteOption votesOn) { this.votesOn = votesOn; }
 
     // PublishedAt
     public Instant getPublishedAt() {
@@ -44,4 +47,14 @@ public class Vote {
     public void setPublishedAt(Instant publishedAt) {
         this.publishedAt = publishedAt;
     }
+
+    // Legacy accessors
+    public String getVoteId() { return voteId; }
+    public void setVoteId(String voteId) { this.voteId = voteId; }
+    public String getVoteOptionId() { return voteOptionId; }
+    public void setVoteOptionId(String voteOptionId) { this.voteOptionId = voteOptionId; }
+
+    // Compatibility accessors for old API naming
+    public User getUser() { return getVotedBy(); }
+    public void setUser(User user) { setVotedBy(user); }
 }

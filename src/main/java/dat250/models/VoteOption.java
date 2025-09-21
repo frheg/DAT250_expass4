@@ -1,22 +1,37 @@
 package dat250.models;
 
+import jakarta.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
+@Entity
 public class VoteOption {
-    private String optionId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String caption;
-    private List<Vote> votes;
+
+    private int presentationOrder;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Poll poll;
+
+    @OneToMany(mappedBy = "votesOn", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Vote> votes = new ArrayList<>();
+
+    // Legacy fields for in-memory manager compatibility (not persisted)
+    @Transient
+    private String optionId;
+    @Transient
     private String pollId;
 
     public VoteOption() {
     }
 
-    // OptionId
-    public String getOptionId()   {
-        return optionId;
-    }
-    public void setOptionId(String optionId)    {
-        this.optionId = optionId;
+    // Id
+    public Long getId()   {
+        return id;
     }
 
     // Caption
@@ -27,19 +42,24 @@ public class VoteOption {
         this.caption = caption;
     }
 
+    public int getPresentationOrder() { return presentationOrder; }
+    public void setPresentationOrder(int presentationOrder) { this.presentationOrder = presentationOrder; }
+
+    // Poll
+    public Poll getPoll() { return poll; }
+    public void setPoll(Poll poll) { this.poll = poll; }
+
     // Votes
     public List<Vote> getVotes()    {
         return votes;
     }
     public void setVotes(List<Vote> votes)  {
-        this.votes = votes;     // NOTE: This implementation may be altered depending on votes should be appended or created new list each time.
+        this.votes = votes;
     }
 
-    // Poll
-    public String getPollId() {
-        return pollId;
-    }
-    public void setPollId(String pollId) {
-        this.pollId = pollId;
-    }
+    // Legacy optionId/pollId for in-memory manager
+    public String getOptionId() { return optionId; }
+    public void setOptionId(String optionId) { this.optionId = optionId; }
+    public String getPollId() { return pollId; }
+    public void setPollId(String pollId) { this.pollId = pollId; }
 }
