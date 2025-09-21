@@ -30,36 +30,59 @@ public class VoteOption {
     }
 
     // Id
-    public Long getId()   {
+    public Long getId() {
         return id;
     }
 
     // Caption
-    public String getCaption()  {
+    public String getCaption() {
         return caption;
     }
-    public void setCaption(String caption)  {
+
+    public void setCaption(String caption) {
         this.caption = caption;
     }
 
-    public int getPresentationOrder() { return presentationOrder; }
-    public void setPresentationOrder(int presentationOrder) { this.presentationOrder = presentationOrder; }
+    public int getPresentationOrder() {
+        return presentationOrder;
+    }
+
+    public void setPresentationOrder(int presentationOrder) {
+        this.presentationOrder = presentationOrder;
+    }
 
     // Poll
-    public Poll getPoll() { return poll; }
-    public void setPoll(Poll poll) { this.poll = poll; }
+    public Poll getPoll() {
+        return poll;
+    }
+
+    public void setPoll(Poll poll) {
+        this.poll = poll;
+    }
 
     // Votes
-    public List<Vote> getVotes()    {
+    public List<Vote> getVotes() {
         return votes;
     }
-    public void setVotes(List<Vote> votes)  {
+
+    public void setVotes(List<Vote> votes) {
         this.votes = votes;
     }
 
     // Legacy optionId/pollId for in-memory manager
-    public String getOptionId() { return optionId; }
-    public void setOptionId(String optionId) { this.optionId = optionId; }
-    public String getPollId() { return pollId; }
-    public void setPollId(String pollId) { this.pollId = pollId; }
+    public String getOptionId() {
+        return optionId;
+    }
+
+    public void setOptionId(String optionId) {
+        this.optionId = optionId;
+    }
+
+    public String getPollId() {
+        return pollId;
+    }
+
+    public void setPollId(String pollId) {
+        this.pollId = pollId;
+    }
 }

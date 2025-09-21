@@ -24,37 +24,64 @@ public class Vote {
 
     private Instant publishedAt;
 
-    public Vote()   {
+    public Vote() {
     }
 
     // Id
-    public Long getId()   {
+    public Long getId() {
         return id;
     }
 
     // votedBy
-    public User getVotedBy() { return votedBy; }
-    public void setVotedBy(User user) { this.votedBy = user; }
+    public User getVotedBy() {
+        return votedBy;
+    }
+
+    public void setVotedBy(User user) {
+        this.votedBy = user;
+    }
 
     // votesOn
-    public VoteOption getVotesOn() { return votesOn; }
-    public void setVotesOn(VoteOption votesOn) { this.votesOn = votesOn; }
+    public VoteOption getVotesOn() {
+        return votesOn;
+    }
+
+    public void setVotesOn(VoteOption votesOn) {
+        this.votesOn = votesOn;
+    }
 
     // PublishedAt
     public Instant getPublishedAt() {
         return publishedAt;
     }
+
     public void setPublishedAt(Instant publishedAt) {
         this.publishedAt = publishedAt;
     }
 
     // Legacy accessors
-    public String getVoteId() { return voteId; }
-    public void setVoteId(String voteId) { this.voteId = voteId; }
-    public String getVoteOptionId() { return voteOptionId; }
-    public void setVoteOptionId(String voteOptionId) { this.voteOptionId = voteOptionId; }
+    public String getVoteId() {
+        return voteId;
+    }
+
+    public void setVoteId(String voteId) {
+        this.voteId = voteId;
+    }
+
+    public String getVoteOptionId() {
+        return voteOptionId;
+    }
+
+    public void setVoteOptionId(String voteOptionId) {
+        this.voteOptionId = voteOptionId;
+    }
 
     // Compatibility accessors for old API naming
-    public User getUser() { return getVotedBy(); }
-    public void setUser(User user) { setVotedBy(user); }
+    public User getUser() {
+        return getVotedBy();
+    }
+
+    public void setUser(User user) {
+        setVotedBy(user);
+    }
 }

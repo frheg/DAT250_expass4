@@ -6,10 +6,6 @@ import jakarta.persistence.PersistenceConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import dat250.models.Poll;
-import dat250.models.Vote;
-import dat250.models.VoteOption;
-
 import java.util.Arrays;
 import java.util.List;
 
