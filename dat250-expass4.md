@@ -1,4 +1,4 @@
-# Experiment assignment 4 - Jakarta Persistence Architecture (JPA)
+# Experiment assignment 4 - Jakarta Persistence API (JPA)
 
 ### Technical problems during installation and use of Java Persistence Architecture (JPA)
 
