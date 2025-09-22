@@ -1,10 +1,22 @@
 # Experiment assignment 4 - Jakarta Persistence Architecture (JPA)
 
-As hand in, you must add a markdown file called dat250-expass4.md, which you should hand in via Canvas by posting a link to it.
+### Technical problems during installation and use of Java Persistence Architecture (JPA)
 
-In particular, you should write about:
+- Working with Hibernate was relatively straight forward, although i did encounter issues regarding types as I initially had userId as a String, but it should be a Long. This was quickly resolved by changing the type.
 
-- technical problems that you encountered during installation and use of Java Persistence Architecture (JPA) and how you resolved
-- a link to your code for experiment 2 above. Make sure the included test case passes!
-- an explanation of how you inspected the database tables and what tables were created. For the latter, you may provide screenshots.
-- any pending issues with this assignment that you did not manage to solve
+### Links and screenshots
+
+- Link to my code: [DAT250_expass4](https://github.com/frheg/DAT250_expass4)
+- Passing test case screenshot: ![alt text](<Screenshot 2025-09-22 at 19.11.46.png>)
+
+### Explanation of how I inspected the database tables and what tables were created.
+
+- I inspected the database directly from `PollsTest.java` test by running simple SQL against `INFORMATION_SCHEMA`. The helper prints the tables and their columns that Hibernate generated for my entities.
+
+- Run the tests from the terminal: `./gradlew test --rerun-tasks`.
+
+- Screenshot: ![alt text](<Screenshot 2025-09-22 at 20.12.53.png>)
+
+### Pending issues
+
+- All tests are currently passing, but I would like to keep complete functionality with the PollManager class, which is currently not fully integrated with JPA.

@@ -20,7 +20,7 @@ public class VoteOption {
     @OneToMany(mappedBy = "votesOn", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Vote> votes = new ArrayList<>();
 
-    // Legacy fields for in-memory manager compatibility (not persisted)
+    // Not used anymore, but kept for PollManager
     @Transient
     private String optionId;
     @Transient
@@ -69,7 +69,7 @@ public class VoteOption {
         this.votes = votes;
     }
 
-    // Legacy optionId/pollId for in-memory manager
+    // Not used anymore, but kept for PollManager
     public String getOptionId() {
         return optionId;
     }

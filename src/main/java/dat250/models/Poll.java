@@ -12,8 +12,7 @@ public class Poll {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Legacy field used by in-memory PollManager (not persisted)
-    @Transient
+    @Transient  // Is transient to avoid being persisted by JPA/Hibernate
     private String pollId;
 
     private String question;

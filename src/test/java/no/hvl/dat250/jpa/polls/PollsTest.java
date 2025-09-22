@@ -12,7 +12,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-// TODO: you may have to adjust the imports to import the domain model entities
 import dat250.models.Poll;
 import dat250.models.User;
 import dat250.models.Vote;
@@ -43,14 +42,48 @@ public class PollsTest {
         em.persist(eve.voteFor(yes));
     }
 
+    private void printTablesAndColumns(EntityManager em) {
+    System.out.println("\n----- TABLES IN H2 -----");
+    String currentSchema = (String) em.createNativeQuery("SELECT CURRENT_SCHEMA() FROM DUAL").getSingleResult();
+    System.out.println("Current schema: " + currentSchema);
+    @SuppressWarnings("unchecked")
+    List<String> tables = em
+        .createNativeQuery(
+            "select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA = SCHEMA() order by TABLE_NAME")
+        .getResultList();
+    System.out.println("Found tables: " + tables.size());
+
+        for (String t : tables) {
+            System.out.println("Table: " + t);
+            @SuppressWarnings("unchecked")
+            List<Object[]> cols = em.createNativeQuery(
+                    "select COLUMN_NAME, DATA_TYPE from INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = SCHEMA() and TABLE_NAME = :t order by ORDINAL_POSITION")
+                    .setParameter("t", t)
+                    .getResultList();
+            for (Object[] c : cols) {
+                String name = String.valueOf(c[0]);
+                String type = String.valueOf(c[1]);
+                System.out.println("  Column: " + name + " (DATA_TYPE=" + type + ")");
+            }
+            System.out.println();
+        }
+    }
+
+    @Test
+    public void inspectDatabase() {
+        emf.runInTransaction(em -> {
+            printTablesAndColumns(em);
+        });
+    }
+
     @BeforeEach
     public void setUp() {
-        EntityManagerFactory emf = new PersistenceConfiguration("polls")
+    EntityManagerFactory emf = new PersistenceConfiguration("polls")
                 .managedClass(Poll.class)
                 .managedClass(User.class)
                 .managedClass(Vote.class)
                 .managedClass(VoteOption.class)
-                .property(PersistenceConfiguration.JDBC_URL, "jdbc:h2:mem:polls")
+        .property(PersistenceConfiguration.JDBC_URL, "jdbc:h2:mem:polls;DB_CLOSE_DELAY=-1") // Keep DB alive after connection closes
                 .property(PersistenceConfiguration.SCHEMAGEN_DATABASE_ACTION, "drop-and-create")
                 .property(PersistenceConfiguration.JDBC_USER, "sa")
                 .property(PersistenceConfiguration.JDBC_PASSWORD, "")

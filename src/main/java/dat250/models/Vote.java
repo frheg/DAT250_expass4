@@ -10,7 +10,7 @@ public class Vote {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Legacy fields for in-memory PollManager compatibility (not persisted)
+    // Not used anymore, but kept for PollManager
     @Transient
     private String voteId;
     @Transient
@@ -59,7 +59,7 @@ public class Vote {
         this.publishedAt = publishedAt;
     }
 
-    // Legacy accessors
+    // Not used anymore, but kept for PollManager
     public String getVoteId() {
         return voteId;
     }
